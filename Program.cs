@@ -1,5 +1,4 @@
-using PreferencesApi.Services;
-using PreferencesApi.Services.IServices;
+using RedisCacheAPI.Services;
 using StackExchange.Redis;
 
 WebApplicationBuilder? builder = WebApplication.CreateSlimBuilder(args);

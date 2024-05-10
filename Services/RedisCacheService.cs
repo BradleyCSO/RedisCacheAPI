@@ -1,7 +1,6 @@
-﻿using PreferencesApi.Services.IServices;
-using StackExchange.Redis;
+﻿using StackExchange.Redis;
 
-namespace PreferencesApi.Services;
+namespace RedisCacheAPI.Services;
 
 public class RedisCacheService(ConnectionMultiplexer connection) : IRedisCacheService
 {

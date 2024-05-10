@@ -1,4 +1,4 @@
-﻿namespace PreferencesApi.Services.IServices;
+﻿namespace RedisCacheAPI.Services;
 
 public interface IRedisCacheService
 {
