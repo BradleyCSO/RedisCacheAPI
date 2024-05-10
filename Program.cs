@@ -1,34 +1,42 @@
 using RedisCacheAPI.Services;
 using StackExchange.Redis;
 
-WebApplicationBuilder? builder = WebApplication.CreateSlimBuilder(args);
+namespace RedisCacheAPI;
 
-builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>(provider =>
+public class Program
 {
-    ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("localhost,abortConnect=false");
-    return new RedisCacheService(connection);
-});
+    static void Main(string[] args)
+    {
+        WebApplicationBuilder? builder = WebApplication.CreateSlimBuilder(args);
 
-WebApplication? app = builder.Build();
+        builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>(provider =>
+        {
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("localhost,abortConnect=false");
+            return new RedisCacheService(connection);
+        });
 
-app.MapPost("{**endpoint}", async (HttpContext context, IRedisCacheService redisCacheService) =>
-{
-    bool writtenToCache = await redisCacheService.StoreDataInCacheAsync(context.Request.Path.Value, context.Response.Body);
+        WebApplication? app = builder.Build();
 
-    if (writtenToCache)
-        return Results.Created();
-    else
-        return Results.BadRequest($"Couldn't write {context.Response.Body} to cache.");
-});
+        app.MapPost("{**endpoint}", async (HttpContext context, IRedisCacheService redisCacheService) =>
+        {
+            bool writtenToCache = await redisCacheService.StoreDataInCacheAsync(context.Request.Path.Value, context.Response.Body);
 
-app.MapGet("{**endpoint}", async (HttpContext context, IRedisCacheService redisCacheService) =>
-{
-    string? cachedData = await redisCacheService.RetrieveDataFromCache(context.Request.Path.Value);
+            if (writtenToCache)
+                return Results.Created();
+            else
+                return Results.BadRequest($"Couldn't write {context.Response.Body} to cache.");
+        });
 
-    if (cachedData != null)
-        return Results.Ok();
-    else
-        return Results.NotFound();
-});
+        app.MapGet("{**endpoint}", async (HttpContext context, IRedisCacheService redisCacheService) =>
+        {
+            string? cachedData = await redisCacheService.RetrieveDataFromCache(context.Request.Path.Value);
 
-app.Run();
+            if (cachedData != null)
+                return Results.Ok();
+            else
+                return Results.NotFound();
+        });
+
+        app.Run();
+    }
+}
