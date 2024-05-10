@@ -15,7 +15,7 @@ public class RedisCacheService(ConnectionMultiplexer connection) : IRedisCacheSe
         }
         finally 
         { 
-            //await connection.CloseAsync(); 
+            await connection.CloseAsync(); 
         }
     }
 
@@ -25,12 +25,11 @@ public class RedisCacheService(ConnectionMultiplexer connection) : IRedisCacheSe
 
         try
         {
-            var item = await connection.GetDatabase().StringGetAsync(cacheKey);
             return await connection.GetDatabase().StringGetAsync(cacheKey);
         }
         finally
         {
-            //await connection.CloseAsync();
+            await connection.CloseAsync();
         }
     }
 
