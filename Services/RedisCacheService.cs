@@ -8,28 +8,14 @@ public class RedisCacheService(ConnectionMultiplexer connection) : IRedisCacheSe
     {
         string cacheKey = GenerateCustomCacheRateLimitKey(request);
 
-        try
-        {
-            return await connection.GetDatabase().StringSetAsync(cacheKey, responseBody.ToString());
-        }
-        finally 
-        { 
-            await connection.CloseAsync(); 
-        }
+        return await connection.GetDatabase().StringSetAsync(cacheKey, responseBody.ToString());
     }
 
     public async Task<string?> RetrieveDataFromCache(string request)
     {
         string cacheKey = GenerateCustomCacheRateLimitKey(request);
 
-        try
-        {
-            return await connection.GetDatabase().StringGetAsync(cacheKey);
-        }
-        finally
-        {
-            await connection.CloseAsync();
-        }
+        return await connection.GetDatabase().StringGetAsync(cacheKey);
     }
 
     private string GenerateCustomCacheRateLimitKey(string endpoint) => $"RateLimit:{endpoint}";
