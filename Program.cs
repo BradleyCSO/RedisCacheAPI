@@ -32,7 +32,7 @@ public class Program
             string? cachedData = await redisCacheService.RetrieveDataFromCache(context.Request.Path.Value);
 
             if (cachedData != null)
-                return Results.Ok();
+                return Results.Ok(cachedData);
             else
                 return Results.NotFound();
         });
