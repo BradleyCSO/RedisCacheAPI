@@ -21,11 +21,11 @@ public interface IRedisCacheService
     /// <returns>The response body if one is stored, else null</returns>
     Task<string?> RetrieveDataFromCache(string request);
 
-    /// <summary>
-    ///     Responsible for generating a cache key given a request: 
-    ///     used for both getting/setting data to the Redis cache instance
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns>The generated cache key provided a valid <see cref="HttpRequest"/></returns>
-    string GenerateCacheKey(HttpRequest request);
+	/// <summary>
+	///     Responsible for generating a cache key given a request: 
+	///     used for both getting/setting data to the Redis cache instance
+	/// </summary>
+	/// <param name="request">The cache key to generate for a given request</param>
+	/// <returns>The generated cache key provided a valid <see cref="HttpRequest"/></returns>
+	string GenerateCacheKey(HttpRequest request);
 }
