@@ -1,10 +1,7 @@
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
+using RedisCacheAPI.Models;
 using RedisCacheAPI.Services;
 using StackExchange.Redis;
-
 
 WebApplicationBuilder? builder = WebApplication.CreateSlimBuilder(args);
 
@@ -13,13 +10,18 @@ builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>(provider =>
     ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("localhost,abortConnect=false");
     return new RedisCacheService(connection);
 });
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+	options.SerializerOptions.TypeInfoResolverChain.Insert(0, SourceGenerationContext.Default);
+    options.SerializerOptions.WriteIndented = false;
+});
 
 WebApplication? app = builder.Build();
 
 app.MapPost("{**endpoint}", async (HttpContext context, IRedisCacheService redisCacheService) =>
 {
-    // Read the stream (JSON representation) we got from the request body into a string
-    using (StreamReader reader = new(context.Request.Body, Encoding.UTF8, true, 1024, true))
+	// Read the stream (JSON representation) we got from the request body into a string
+	using (StreamReader reader = new(context.Request.Body, Encoding.UTF8))
     {
         string responseBody = await reader.ReadToEndAsync();
                 
@@ -35,22 +37,10 @@ app.MapGet("{**endpoint}", async (HttpContext context, IRedisCacheService redisC
 {
     string? cachedData = await redisCacheService.RetrieveDataFromCache(redisCacheService.GenerateCacheKey(context.Request));
 
-    var options = new JsonSerializerOptions();
-    options.TypeInfoResolver = new SourceGenerationContext();
-
-    cachedData = JsonSerializer.Serialize<object>(cachedData, options);
-        
-    if (cachedData != null)
-        return Results.Ok(cachedData);
+	if (cachedData != null)
+        return Results.Content(cachedData);
 
     return Results.NotFound();
 });
 
 app.Run();
-
-[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]
-[JsonSerializable(typeof(String))]
-[JsonSerializable(typeof(Object))]
-internal partial class SourceGenerationContext : JsonSerializerContext
-{
-}
