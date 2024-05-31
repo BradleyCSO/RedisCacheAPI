@@ -10,9 +10,9 @@ public interface IRedisCacheService
     /// </summary>
     /// <param name="request">The request's endpoint: used to set the cache's key</param>
     /// <param name="responseBody">The response body we're caching</param>
-    /// <param name="expiry">TTL: The duration (in seconds) that the entry stays stored in the cache</param>
+    /// <param name="expiry">TTL: The duration (in seconds) that the entry stays stored in the cache: default 3600 seconds (1 hour)</param>
     /// <returns>Boolean: true if the item was stored, else false</returns>
-    Task<bool> StoreDataInCacheAsync(string request, string responseBody, int expiry = 60);
+    Task<bool> StoreDataInCacheAsync(string request, string responseBody, int expiry = 3600);
 
     /// <summary>
     ///     Responsible for getting items from a Redis cache instance
